@@ -319,8 +319,15 @@ describe "PackageManager", ->
             atom.packages.activatePackage("package-with-stylesheets")
 
           runs ->
-            element = atom.styles.getStyleElements().find (element) -> element.context is 'test-context'
-            expect(element).toBeDefined()
+            path = require 'path'
+            elements = {}
+            for element in atom.styles.getStyleElements()
+              sourcePath = element.getAttribute('source-path')
+              elements[path.basename(sourcePath)] = element
+
+            expect(elements['1.css'].context).toBeUndefined()
+            expect(elements['4.test-context.css'].context).toBe 'test-context'
+            expect(elements['5.css'].context).toBeUndefined()
 
       describe "grammar loading", ->
         it "loads the package's grammars", ->
